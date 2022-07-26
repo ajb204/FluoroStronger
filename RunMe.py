@@ -21,7 +21,7 @@ sys.path.append('./py')   #adding py to the path (this contains the source code)
 
 from fit import fitter    #bring in a fitting module
 
-PROCESS=True #False #True  #set to true of fitting
+PROCESS=False #True  #set to true of fitting
 ############################################################
 if(PROCESS):
     from anal import process  #bring in a process module
