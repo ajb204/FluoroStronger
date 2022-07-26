@@ -1,0 +1,45 @@
+
+#############################################################
+Welcome to FluoroStronger.
+
+This takes either Bruker fids and tries to process them using
+nmrPipe, or takes text files of data from topspin/mestrec or
+whereever.
+
+A user then specifies a set of initial conditions, numbers
+of singlets or quartets. They should simulate the spectrum,
+make sure the initial conditions are okay, then run the fitting.
+
+Results are dumped to a text file. If gnuplot is in the path,
+the program will make a nice figure for you to play with.
+
+The program is setup to run on a dataset. Use this to make
+sure you can operate the program. Then edit the input
+script for your problem.
+
+############################################################
+To execute:
+
+from this folder type:
+
+python RunMe.py
+
+The code will do the rest. Edit RunMe.py to get to the settings.
+#############################################################
+FluoroStronger is in python2.7. I appreciate this is depreciated.
+
+Dependencies: all python modules are standard.
+It does require the excellent nmrglue (which can be installed via pip).
+
+To get nice figures, gnuplot must be installed and in the
+path. If gnuplot is not there, not a problem, just open the output
+in your favourite spreadsheet and plot it.
+
+Have fun!
+
+A.Baldwin July 2011
+(c) University of Oxford
+
+
+
+
