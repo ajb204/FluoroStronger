@@ -27,9 +27,13 @@ python RunMe.py
 The code will do the rest. Edit RunMe.py to get to the settings.
 #############################################################
 FluoroStronger is in python2.7. I appreciate this is depreciated.
+Not all old things are bad.
 
-Dependencies: all python modules are standard.
-It does require the excellent nmrglue (which can be installed via pip).
+Dependencies: all python modules for fitting are standard.
+
+For processing, it requires the excellent nmrglue (which can be 
+installed via pip), and nmrPipe. Ignore these installs if not 
+processing.
 
 To get nice figures, gnuplot must be installed and in the
 path. If gnuplot is not there, not a problem, just open the output
