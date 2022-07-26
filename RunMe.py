@@ -13,17 +13,15 @@ print "A.Baldwin July 2021"
 print "(c) University of Oxford"
 print 
 
-
 import sys,os   #I need these standard modules.
 sys.path.append('./py')   #adding py to the path (this contains the source code)
-from anal import process  #bring in a process module
 from fit import fitter    #bring in a fitting module
 
 PROCESS=False #True  #set to true of fitting
-
-
 ############################################################
 if(PROCESS):
+    from anal import process  #bring in a process module 
+
     #O1 takes 'temp', 'guess' or a value for centre of spectrum
     wf=15       #line broadening. (lb)
     o1 ='guess' #figure out a sensible o1 from temperature using acqus. 
