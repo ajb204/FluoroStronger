@@ -3,8 +3,11 @@
 #A.Baldwin July 2011
 #(c) University of Oxford
 
+from __future__ import absolute_import
+from __future__ import print_function
 import sys,os,numpy,copy
 from scipy.optimize import leastsq
+from six.moves import range
 
 class fitter():
     def __init__(self,infile,tag,rng,A,Aqs,Ass,offqs,offss,Rqs,Rss,Jqs,frq,fit=True,jiggles=True,g=0.5E11):
@@ -64,7 +67,7 @@ class fitter():
         if(fit or jiggles):  #when done, repeat calculation
             self.StrongCalc() 
         self.printfile()  #dump output file
-        print 'Finished! Have a nice day.'
+        print('Finished! Have a nice day.')
 
     ############################################
     def pack(self): #pack variables into fitting vector
@@ -117,7 +120,7 @@ class fitter():
         xinit=self.pack()
         x0=leastsq(self.chi,xinit)
         if(verb=='y'):
-            print x0[0]
+            print(x0[0])
     def chi2(self):  #return the chi2 value
         return numpy.sum((self.sim-self.raw)**2.)/len(self.ppm)/numpy.max(self.raw)
         
@@ -135,7 +138,7 @@ class fitter():
         
         parsBest=self.pack()
         chi2best=self.chi2()
-        print 'starting chi2:',chi2best
+        print('starting chi2:',chi2best)
         go=0
         cnt=0
         while(go==0):
@@ -146,11 +149,11 @@ class fitter():
             #print self.pack()
             self.Fit(verb='n')
             chi2curr=self.chi2()
-            print 'best:',chi2best,'curr:',chi2curr,'cnt:',cnt
+            print('best:',chi2best,'curr:',chi2curr,'cnt:',cnt)
 
 
             if(chi2curr<chi2best):
-                print '   yay! keeping!'
+                print('   yay! keeping!')
                 parsBest=self.pack()
                 chi2best=chi2curr
                 cnt=0
@@ -163,7 +166,7 @@ class fitter():
         
 
     def readfile(self): #read raw data
-        print 'Reading ',self.infile
+        print('Reading ',self.infile)
         dat=[]
         inny=open(self.infile)
         for line in inny.readlines():

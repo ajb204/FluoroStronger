@@ -1,27 +1,30 @@
 #!/usr/bin/python
-print "-----------------------------------------------"
-print "Hello! I am FluroStronger"
-print "-----------------------------------------------"
-print "I take Bruker fids, process them using nmrPipe"
-print "Alternatively, save the spectrum as a text file"
-print "and ignore the processing parts of the code."
-print "Then take the data and fit to a series of singlets"
-print "and quartets."
-print "I hope this works for you. Email us if not."
-print "-----------------------------------------------"
-print "A.Baldwin July 2021"
-print "(c) University of Oxford"
-print 
+from __future__ import absolute_import
+from __future__ import print_function
+print("-----------------------------------------------")
+print("Hello! I am FluroStronger")
+print("-----------------------------------------------")
+print("I take Bruker fids, process them using nmrPipe")
+print("Alternatively, save the spectrum as a text file")
+print("and ignore the processing parts of the code.")
+print("Then take the data and fit to a series of singlets")
+print("and quartets.")
+print("I hope this works for you. Email us if not.")
+print("-----------------------------------------------")
+print("A.Baldwin July 2021")
+print("(c) University of Oxford")
+print() 
+
 
 import sys,os   #I need these standard modules.
 sys.path.append('./py')   #adding py to the path (this contains the source code)
+
 from fit import fitter    #bring in a fitting module
 
-PROCESS=False #True  #set to true of fitting
+PROCESS=True #False #True  #set to true of fitting
 ############################################################
 if(PROCESS):
-    from anal import process  #bring in a process module 
-
+    from anal import process  #bring in a process module
     #O1 takes 'temp', 'guess' or a value for centre of spectrum
     wf=15       #line broadening. (lb)
     o1 ='guess' #figure out a sensible o1 from temperature using acqus. 
@@ -47,7 +50,7 @@ if(PROCESS):
     for i,expt in enumerate(expts): #run over array of experiments. look for Bruker files.
 
         process(expt,'NMR','find',700,(1.92,3.53),p0,pars['p1'],wf,ws=8,O1=o1,base='lin',basePars=pars['base'],amx=True)
-        print expt
+        print(expt)
         bef=os.getcwd()
         os.chdir(expt)
         subprocess.call("pipe2txt.tcl test.ft2 -index ppm > test.txt", shell=True, executable='/bin/csh') #turn processed data into a text file.

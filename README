@@ -18,22 +18,29 @@ sure you can operate the program. Then edit the input
 script for your problem.
 
 ############################################################
-To execute:
+To execute, you need python3 installed and in the system path.
 
-from this folder type:
+From this folder then type:
 
 python RunMe.py
 
+or
+
+python3 RunMe.py
+
 The code will do the rest. Edit RunMe.py to get to the settings.
 #############################################################
-FluoroStronger is in python2.7. I appreciate this is depreciated.
-Not all old things are bad.
+FluoroStronger is in python3.
 
-Dependencies: all python modules for fitting are standard.
+Dependencies: all python modules are standard.
 
-For processing, it requires the excellent nmrglue (which can be 
-installed via pip), and nmrPipe. Ignore these installs if not 
-processing.
+For processing, the python module nmrGlue is required (which can be 
+installed via pip) as well as nmrPipe. Make sure the nmrPipe tools
+are in the system's path (such as pipe2txt.tcl), which will be the
+case if you move into cshell as described for routine nmrPipe usage.
+
+To fit data, you just need a text file of your data, which could
+come from topsin, mestrec, or wherever. 
 
 To get nice figures, gnuplot must be installed and in the
 path. If gnuplot is not there, not a problem, just open the output

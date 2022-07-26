@@ -3,10 +3,13 @@
 # Functions to work out an fid.com conversion script
 # Use at your peril.
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os,sys
 from scipy.optimize import leastsq
 import nmrglue as ng
 import numpy
+from six.moves import range
 
 #A.Baldwin July 2021
 #(c) University of Oxford
@@ -35,8 +38,8 @@ class vpar():
         self.posNoise=numpy.min(basePars[0][:2]),numpy.max(basePars[0][:2])
         if(len(basePars[0])!=4):
             self.midNoise=[]
-            print len(basePars[0])/2-2
-            for i in range(len(basePars[0])/2-2):
+            print(len(basePars[0])/2-2)
+            for i in range(int(len(basePars[0])/2-2)):
                 self.midNoise.append((numpy.min(basePars[0][2+2*i:2*i+4]),numpy.max(basePars[0][2+2*i:2*i+4])))
             self.negNoise=numpy.min(basePars[0][-2:]),numpy.max(basePars[0][-2:])
         else:
@@ -62,10 +65,10 @@ class vpar():
         testfiles.append('ser')
         testfiles.append('fid.gz')
         testfiles.append('ser.gz')
-        print testfiles
+        print(testfiles)
         tick=0
         for test in testfiles:
-            print test,os.path.join(outdir,test),os.path.exists(os.path.join(outdir,test))==True
+            print(test,os.path.join(outdir,test),os.path.exists(os.path.join(outdir,test))==True)
             if(os.path.exists(os.path.join(outdir,test))==True):
                tick=1
                infid=os.path.join(outdir,test)
@@ -80,7 +83,7 @@ class vpar():
 
                
         if(tick==0):
-            print 'Cannot find fid. Aborting.'
+            print('Cannot find fid. Aborting.')
             
             return 
 
@@ -92,8 +95,8 @@ class vpar():
                
                
         if(os.path.exists(os.path.join(outdir,'procpar'))==0 and os.path.exists(os.path.join(outdir,'acqus'))==0):
-            print 'Cannot find procpar (varian) or acqus (bruker)'
-            print 'in folder',outdir
+            print('Cannot find procpar (varian) or acqus (bruker)')
+            print('in folder',outdir)
             return
         self.dim=dim
         self.labb=labb
@@ -107,7 +110,7 @@ class vpar():
         self.GetSequence()
         self.Convert()
         if(self.abort==1):
-            print 'Conversion aborted - errors encountered'
+            print('Conversion aborted - errors encountered')
             return
 
         self.PipeParse()
@@ -195,9 +198,9 @@ class vpar():
 
 
     def DoWalkP0(self,phbest0,phmax0,grids):
-        print 'phase:',self.p0_0,self.p1_0 #'%.4e' % self.ChiPhase((self.p0_0,self.p1_0))[0]
+        print('phase:',self.p0_0,self.p1_0) #'%.4e' % self.ChiPhase((self.p0_0,self.p1_0))[0]
         for k in range(3): #repeat thrice.
-            print 'walking p0',phbest0,'+/-',phmax0,self.p1_0
+            print('walking p0',phbest0,'+/-',phmax0,self.p1_0)
             phaseTest0=numpy.linspace(phbest0-phmax0,phbest0+phmax0,grids)
             #print phaseTest0
             grid=[]
@@ -222,13 +225,13 @@ class vpar():
             phmax0=phmax0/10
             #phmax1=phmax1/10
 
-        print 'best p0 found:',self.p0_0,'%.4e' % numpy.min(grid)
+        print('best p0 found:',self.p0_0,'%.4e' % numpy.min(grid))
         return self.p0_0,numpy.min(grid)
             
     def DoWalkP1(self,phbest1,phmax1,grids):
-        print 'phase:',self.p0_0,self.p1_0 #,'%.4e' % self.ChiPhase((self.p0_0,self.p1_0))[0]
+        print('phase:',self.p0_0,self.p1_0) #,'%.4e' % self.ChiPhase((self.p0_0,self.p1_0))[0]
         for k in range(3): #repeat thrice.
-            print 'walking p1',phbest1,'+/-',phmax1
+            print('walking p1',phbest1,'+/-',phmax1)
             phaseTest1=numpy.linspace(phbest1-phmax1,phbest1+phmax1,grids)
             grid=[]
             phs=[]
@@ -255,13 +258,13 @@ class vpar():
             #phmax0=phmax0/10
             phmax1=phmax1/10
             #outy.write('\n\n')
-        print 'best p1 found:',self.p1_0,'%.4e' % numpy.min(grid)
+        print('best p1 found:',self.p1_0,'%.4e' % numpy.min(grid))
         return self.p1_0,numpy.min(grid)
             
     def DoWalkGrid(self):
         for k in range(3): #repeat thrice.
             phaseTest0=numpy.linspace(phbest0-phmax0,phbest0+phmax0,20)
-            print phaseTest0
+            print(phaseTest0)
             if(self.p1=='auto'):
                 phaseTest1=numpy.linspace(phbest1-phmax1,phbest1+phmax1,20)
             grid=[]
@@ -300,7 +303,7 @@ class vpar():
 
             
     def SetBaselineBoundary(self):
-        print 'setting baseline boundaries..'
+        print('setting baseline boundaries..')
         x2=numpy.average(self.posNoise)  #positive extrema
         xm=numpy.average(self.midNoise[0]) #first boundary from positive
             
@@ -311,7 +314,7 @@ class vpar():
         self.xrefs.append((x2,xm))       #between first boundary and positive extrema
         self.regiref.append(self.Frq>=xm) #frequencies from boundary average to extrema
         self.freqref.append(self.Frq[self.regiref[-1]])
-        print self.xrefs[-1],self.regiref[-1],self.freqref[-1]
+        print(self.xrefs[-1],self.regiref[-1],self.freqref[-1])
         
         for i in range(len(self.midNoise)-1): #loop over interior boundaries
             xb=numpy.average(self.midNoise[i])   #positive
@@ -319,25 +322,25 @@ class vpar():
             self.xrefs.append((xb,xa))          #most positive, then less positive
             self.regiref.append((self.Frq<xb)*(self.Frq>=xa)) #region is between these two.
             self.freqref.append(self.Frq[self.regiref[-1]])
-            print self.xrefs[-1],self.regiref[-1],self.freqref[-1]
+            print(self.xrefs[-1],self.regiref[-1],self.freqref[-1])
                 
         x1=numpy.average(self.negNoise)       #negative extrema
         xm=numpy.average(self.midNoise[-1])   #least positive boundary
         self.xrefs.append((xm,x1))            #most positive, then less positive
         self.regiref.append((self.Frq<xm ))
         self.freqref.append(self.Frq[self.regiref[-1]])
-        print self.xrefs[-1],self.regiref[-1],self.freqref[-1]
+        print(self.xrefs[-1],self.regiref[-1],self.freqref[-1])
 
             
         self.maskref=[]
         self.maskref.append(( (self.Frq>numpy.min(self.posNoise)) * (self.Frq<numpy.max(self.posNoise)),(self.Frq>numpy.min(self.midNoise[0])) * (self.Frq<numpy.max(self.midNoise[0])))) #most positive, then less positive.
-        print numpy.min(self.posNoise),numpy.max(self.posNoise),numpy.min(self.midNoise[0]),numpy.max(self.midNoise[0])
+        print(numpy.min(self.posNoise),numpy.max(self.posNoise),numpy.min(self.midNoise[0]),numpy.max(self.midNoise[0]))
         for i in range(len(self.midNoise)-1):
             self.maskref.append(((self.Frq>numpy.min(self.midNoise[i])) * (self.Frq<numpy.max(self.midNoise[i])),(self.Frq>numpy.min(self.midNoise[i+1])) * (self.Frq<numpy.max(self.midNoise[i+1]))))
-            print numpy.min(self.midNoise[i]),numpy.max(self.midNoise[i]),numpy.min(self.midNoise[i+1]),numpy.max(self.midNoise[i+1])
+            print(numpy.min(self.midNoise[i]),numpy.max(self.midNoise[i]),numpy.min(self.midNoise[i+1]),numpy.max(self.midNoise[i+1]))
         self.maskref.append(((self.Frq>numpy.min(self.midNoise[-1])) * (self.Frq<numpy.max(self.midNoise[-1])),(self.Frq>numpy.min(self.negNoise)) * (self.Frq<numpy.max(self.negNoise))))
-        print numpy.min(self.midNoise[-1]),numpy.max(self.midNoise[-1]),numpy.min(self.negNoise),numpy.max(self.negNoise)
-        print 'done'
+        print(numpy.min(self.midNoise[-1]),numpy.max(self.midNoise[-1]),numpy.min(self.negNoise),numpy.max(self.negNoise))
+        print('done')
 
         #for i in range(len(self.maskref)):
         #    print self.Frq[self.maskref[i][0]],self.Frq[self.maskref[i][1]]
@@ -433,36 +436,36 @@ class vpar():
         outy.close()
         """
 
-        print self.p0_0,self.p1_0
+        print(self.p0_0,self.p1_0)
 
         self.ChiPhase(self.packPhase())
 
         #self.p1='auto'
         
-        print 'grid:',self.p0_0,self.p1_0
+        print('grid:',self.p0_0,self.p1_0)
         #now optimise, including p1 if desired.
 
         outy=open('test.out','w')
-        print self.o1p
+        print(self.o1p)
         for i in range(len(self.Frq)):
             outy.write('%e\t%e\n' % (self.Frq[i],self.Fft[i]))
         outy.close()
         
         x0=leastsq(self.ChiPhase,self.packPhase())
         #x0=(self.p0_0,self.p1_0),0
-        print x0[0]
-        print 'after optimisation:'
-        print 'p0:',self.p0_0
-        print 'p1:',self.p1_0
+        print(x0[0])
+        print('after optimisation:')
+        print('p0:',self.p0_0)
+        print('p1:',self.p1_0)
 
         #update globals for nmrproc.com.
         self.p1=self.p1_0
         self.phase=self.p0_0
 
 
-        print len(self.PhaseData)
+        print(len(self.PhaseData))
         outy=open('test.out','w')
-        print self.o1p
+        print(self.o1p)
         for i in range(len(self.Frq)):
             outy.write('%e\t%e\n' % (self.Frq[i],self.Fft[i]))
         outy.close()
@@ -624,7 +627,7 @@ class vpar():
         if(nuc=='F19'):
             CONV=0.9412866605363297
         """
-        print lab,lab[0],self.dfrq/self.sfrq,self.dfrq/self.sfrq-0.25
+        print(lab,lab[0],self.dfrq/self.sfrq,self.dfrq/self.sfrq-0.25)
 
         if(lab[0]=='C'):
             if(numpy.fabs(self.dfrq/self.sfrq-0.25)<1E-2):
@@ -639,7 +642,7 @@ class vpar():
         if(lab[0]=='H'):
             if(numpy.fabs(self.sfrq/self.sfrq-1)<1E-2):
                 return self.sfrq,self.tn
-        print 'neither sfrq,dfrq nor dfrq2 seem to correspond to label',lab
+        print('neither sfrq,dfrq nor dfrq2 seem to correspond to label',lab)
         self.abort=1
         return -1
 
@@ -653,7 +656,7 @@ class vpar():
         
         if(self.dim>=3):
             if(os.path.exists(os.path.join(self.outdir,'acqu3s'))==0):
-                print 'No acqu3s'
+                print('No acqu3s')
                 aq3=False
             else:
                 aq3=True
@@ -697,10 +700,10 @@ class vpar():
                 
         if(self.dim>1):
             self.aqseq=self.GetAcqseq()
-            print 'aqseq:',self.aqseq
+            print('aqseq:',self.aqseq)
             if(self.dim==3):
                 if(self.aqseq=='312'):
-                    print 'Swapping ni2 and ni'
+                    print('Swapping ni2 and ni')
                     self.ni2,self.ni=self.ni,self.ni2
                     self.yMode,self.zMode=self.zMode,self.yMode
                 else: #self.aqseq='321'
@@ -804,7 +807,7 @@ class vpar():
                             self.NUC4='N15'
                     
         if(self.dim==3):
-            print self.NUC1,self.NUC2,self.NUC3
+            print(self.NUC1,self.NUC2,self.NUC3)
         
         #print self.SFO1,self.SFO2,self.SFO3
         #print self.O1,self.O2,self.O3
@@ -825,7 +828,7 @@ class vpar():
                 self.f1ppm=self.O2/self.BF2        
 
         elif(self.o1p=='guess'):
-            print self.labb
+            print(self.labb)
             #print self.NUC1,self.NUC2,self.NUC3
             #self.waterppm=self.o1p
             if(self.dim>1):
@@ -839,7 +842,7 @@ class vpar():
                 #        self.f3ppm=self.shift(self.frq3,nuc=self.NUC4)
         else:
 
-            print self.labb
+            print(self.labb)
             #print self.NUC1,self.NUC2,self.NUC3
             self.waterppm=self.o1p
             if(self.dim>1):
@@ -925,7 +928,7 @@ class vpar():
         elif(lab[0]==self.NUC3[0]):
             return self.SFO3,self.O3/self.BF3
         else:
-            print 'Cannot figure out shifts'
+            print('Cannot figure out shifts')
             return -1,-1
                 
 
@@ -943,13 +946,13 @@ class vpar():
 
         if(self.dim==3):
             self.ni2=int(self.GetParVarian(('','ni2'))[0])
-            print 'ni:',self.ni,'np:',self.np,'ni2:',self.ni2
+            print('ni:',self.ni,'np:',self.np,'ni2:',self.ni2)
         if(self.dim==4):
             self.ni2=int(self.GetParVarian(('','ni2'))[0])
             self.ni3=int(self.GetParVarian(('','ni3'))[0])
-            print 'ni:',self.ni,'np:',self.np,'ni2:',self.ni2,'ni3:',self.ni3
+            print('ni:',self.ni,'np:',self.np,'ni2:',self.ni2,'ni3:',self.ni3)
 
-        print self.GetParVarian(('','array'))[0]
+        print(self.GetParVarian(('','array'))[0])
         array=self.GetParVarian(('','array'))[0].split('"')[1].split(',')
         if(self.dim==2):
             self.acqORD=''
@@ -988,21 +991,21 @@ class vpar():
         self.f1180_flg=self.GetParVarian(('','f1180'))[0]
         self.f2180_flg=self.GetParVarian(('','f2180'))[0]
 
-        print self.labb
+        print(self.labb)
 
         if(self.o1p=='auto'):
             self.temp=float(self.GetParVarian(('','temp'))[0])
-            print self.temp
+            print(self.temp)
             try:
                 self.waterppm=self.WaterPPM()
                 self.waterppmTOF=self.waterppm
-                print 'temp:',self.temp,'water ppm:',self.waterppm
+                print('temp:',self.temp,'water ppm:',self.waterppm)
             except:
-                print 'cannot find temperature: guessing carrier as 4.7ppm'
+                print('cannot find temperature: guessing carrier as 4.7ppm')
                 self.waterppm=4.7
                 self.waterppmTOF=self.waterppm
             try:
-                print 'Found tof_me: moving carrier'
+                print('Found tof_me: moving carrier')
                 self.tof=float(self.GetParVarian(('','tof'))[0])
                 self.tof_me=float(self.GetParVarian(('','tof_me'))[0])
                 self.waterppm+=-(self.tof-self.tof_me)/self.sfrq#adjust carrier, but not used for referencing other dimensions
@@ -1012,20 +1015,20 @@ class vpar():
             self.waterppm=self.o1p
             self.waterppmTOF=self.waterppm
             
-        print self.waterppm
-        print 'first nuclei (assuming proton):',self.labb[0],self.sfrq
-        print 'second nuclei :',self.labb[1]
+        print(self.waterppm)
+        print('first nuclei (assuming proton):',self.labb[0],self.sfrq)
+        print('second nuclei :',self.labb[1])
 
         self.tn=self.GetParVarian(('','tn'))[0].split('"')[1]
         self.dn=self.GetParVarian(('','dn'))[0].split('"')[1]
         self.dn2=self.GetParVarian(('','dn2'))[0].split('"')[1]
-        print self.tn,self.dn,self.dn2
+        print(self.tn,self.dn,self.dn2)
 
         if(self.tn!='H1'):
-            print 'direct nucleus isnt proton: you will need to write your own conversion script.'
+            print('direct nucleus isnt proton: you will need to write your own conversion script.')
             self.abort=1
             return 
-        print self.labb,self.labb[0]
+        print(self.labb,self.labb[0])
         self.frq1,self.n1=self.GetNuc(self.labb[1])
         if(self.dim==3):
             self.frq2,self.n2=self.GetNuc(self.labb[2])
@@ -1062,8 +1065,8 @@ class vpar():
         samp=numpy.array(samp)
 
         maxy=numpy.max(samp,axis=0)
-        print 'maxy',maxy
-        print 'Points in sampling schedule:',samp
+        print('maxy',maxy)
+        print('Points in sampling schedule:',samp)
         self.ni=maxy[0]+1
         self.ni2=maxy[1]+1
         if(self.dim==4):
@@ -1169,8 +1172,8 @@ class vpar():
             if(self.quant==False):
                 if(self.rk[i]==0):
                     if(self.tp=='bruk'):
-                        print self.mode[i]
-                        print self.modDict[self.mode[i]]
+                        print(self.mode[i])
+                        print(self.modDict[self.mode[i]])
                         M.append(self.modDict[self.mode[i]])
                     else:
                         M.append('Complex')
@@ -1275,7 +1278,7 @@ class vpar():
         return 5.060 - 0.0122*self.temp + (2.11E-5)*self.temp**2.
 
     def GetSpectrometerType(self,path='./'):
-        print path
+        print(path)
         if(os.path.exists(path+'/acqu')==1 or os.path.exists(path+'/acqu2')==1):
             sys.stdout.write('Found acqu: we are Bruker!\n')
             self.tp='bruk'
@@ -1294,7 +1297,7 @@ class vpar():
             if(len(test)>1):
                 if(test[0]=='aqseq'):
                     return test[1]
-        print 'Cannot find acqseq in pulseprogram'
+        print('Cannot find acqseq in pulseprogram')
         return -1
             
     def GetSequence(self):
@@ -1306,7 +1309,7 @@ class vpar():
             parfile=self.GetOmegaParFile()
             test=self.GetParOmega(parfile,'n',('','seq_source',))[0].split('/')
             seqfil=test[len(test)-1]
-        print 'pulse sequence name:',seqfil        
+        print('pulse sequence name:',seqfil)        
 
     def readfile(self,infile):
         peak=[]

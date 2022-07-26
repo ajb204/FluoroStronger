@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
+from __future__ import absolute_import
+from __future__ import print_function
 from vpar_decon import vpar
 
 import os,numpy,sys,re
 import nmrglue as ng
+from six.moves import range
 
 #######################################################
 # Core class for processing. Reads acqus to get
@@ -28,7 +31,7 @@ class process():
         self.ws=ws
         self.base=base
         self.basePars=basePars
-        print basePars
+        print(basePars)
         self.STD=False
         self.freqFile=freqFile
         self.amx=amx
@@ -79,7 +82,7 @@ class process():
             
             if(1==1):
                 bef=os.getcwd()
-                print file
+                print(file)
                 #if(file=='./Round 1/Sample 2 - CF2 Met(O)/7 h 19F + f_b/7 h 19F main/'):
                 #    pass
                 #else:
@@ -95,12 +98,12 @@ class process():
                 if(os.path.exists('./pdata')):
                     os.system('rm -rf pdata')
 
-                print
-                print
-                print 'Looking at expNo:',file
+                print()
+                print()
+                print('Looking at expNo:',file)
                 
                 folly=os.listdir('./')
-                print folly
+                print(folly)
 
                 if('ser' in folly or 'ser.gz' in folly): #we are a 2D or pseudo 2D
 
@@ -115,18 +118,18 @@ class process():
 
 
                     inst=vpar('.',2,'H1',(0,0,),self.phase,self.p1,self.wf,quant=True,ws=self.ws,o1p=self.O1,base=self.base,amx=self.amx)
-                    print 'file:',file
+                    print('file:',file)
                     d20=float(inst.GetParBruk('acqus',('','D20'))[0])
                     pl10=float(inst.GetParBruk('acqus',('','CNST62'))[0])
                     pars=(inst.GetParBrukFile(self.freqFile))
-                    print self.freqFile,':',pars
+                    print(self.freqFile,':',pars)
                     excite=[]
                     for par in pars:
                         try:
                             excite.append( (float(par[0])-inst.O1)/inst.frq+inst.waterppm)
                         except:
                             pass
-                    print 'excitation ppms:',excite
+                    print('excitation ppms:',excite)
                     outy=open('../raw.'+tag+'.data.excite','w') #print excitation ppm values (for use later)
                     for e in excite:
                         outy.write('%f\n' % e)
@@ -148,7 +151,7 @@ class process():
                     if('vdlist' in folly):
                         #read in mixing times, and consolidate data to unique mixing times
                         pars2=(inst.GetParBrukFile('vdlist'))
-                        print 'vdlist',':',pars2 
+                        print('vdlist',':',pars2) 
                         data=data.reshape((len(pars2),len(pars),Size[1])) #reshape the data
                         frq=numpy.zeros_like(data)
                         mix=numpy.zeros_like(data)
@@ -162,11 +165,11 @@ class process():
                         for i,p in enumerate(pars):
                             val=excite[i]
                             frq[:,i,:]=val  #setup 3D array with frequencies
-                            print val
+                            print(val)
                         mixTotal=numpy.array(mixTotal) #turn to numpy
                         mix=numpy.unique(mix)  #get unique mixing times.
-                        print mix       #unique mixing times
-                        print mixTotal  #tota mixing times
+                        print(mix)       #unique mixing times
+                        print(mixTotal)  #tota mixing times
                         datNew=numpy.zeros((len(mix),len(pars),Size[1])) #get new array for data
                         for m,mi in enumerate(mix):  #for each unique mixing time
                             for e,ex in enumerate(excite):  #for each unique excitation time
@@ -197,7 +200,7 @@ class process():
                             #print argy,index[argy],inty
                             #vals.append(data[1,argy]-data[0,argy])
                             vals.append(data[-1,-1,argy]-data[0,-1,argy])
-                        print 'vals:',vals
+                        print('vals:',vals)
 
 
                     else:
@@ -224,12 +227,12 @@ class process():
                             argy=numpy.abs(index-inty).argmin()
                             #print argy,index[argy],inty
                             vals.append(data[1,argy]-data[0,argy])
-                        print 'vals:',vals
+                        print('vals:',vals)
 
 
-                    print 'index:',index.shape
-                    print "Spectrum dimensions (pts): ",Size   #print the spectral dimensions
-                    print "direct dimension limits (ppm): ", numpy.max(index),numpy.min(index)  #direct 
+                    print('index:',index.shape)
+                    print("Spectrum dimensions (pts): ",Size)   #print the spectral dimensions
+                    print("direct dimension limits (ppm): ", numpy.max(index),numpy.min(index))  #direct 
 
 
                     outy2.write('%f\t%f\t%e\t%e\n' % (d20,pl10,vals[0],vals[1]))
@@ -238,7 +241,7 @@ class process():
 
 
                 else:
-                    print 'hello! I am a 1D NMR spectrum'
+                    print('hello! I am a 1D NMR spectrum')
 
                     #inst=vpar('.',2,'H1',(0,0,),self.phase,self.wf,quant=True)                
                     #if('test.ft2' not in os.listdir('./')):
@@ -246,7 +249,7 @@ class process():
                         inst=vpar('.',1,'H1',(0,),self.phase,self.p1,self.wf,quant=True,ws=self.ws,o1p=self.O1,base=self.base,amx=self.amx,basePars=self.basePars)
                         dic,data = ng.pipe.read('test.ft2') #read fids
                         Size=data.shape
-                        print "Spectrum dimensions (pts): ",Size   #print the spectral dimensions        
+                        print("Spectrum dimensions (pts): ",Size)   #print the spectral dimensions        
                         index=[]
                         #for i in range((Size[0])):
                         #    index.append((uc0.ppm(0)-i*(-uc0.ppm(Size[0]-1)+uc0.ppm(0))/(Size[0]-1)))
@@ -257,12 +260,12 @@ class process():
                         death.append(int(file))
                     else:
                         death.append(file)
-                print os.getcwd()
+                print(os.getcwd())
                 os.chdir(bef)
-                print bef
+                print(bef)
                 cnt+=1
 
-        print death
+        print(death)
         outy2.close()
 
         if(os.path.exists('figs')==0):
@@ -294,7 +297,7 @@ class process():
             
             gnu.close()
             os.system('gnuplot gnu.gp')
-            print 'deleting:',death
+            print('deleting:',death)
             for de in death:
                 os.system('rm -rf '+de)
         elif(self.STD=='2D'):
@@ -329,7 +332,7 @@ class process():
             
             gnu.close()
             os.system('gnuplot gnu.gp')
-            print 'deleting:',death
+            print('deleting:',death)
             for de in death:
                 os.system('rm -rf '+de)
 
@@ -344,13 +347,13 @@ class process():
             #Dat,Dita = ng.pipe.read(str(death[0])+'/test.fid') #read fids
             
             NewData=numpy.zeros((len(death),len(Data)),dtype='float32')
-            print NewData.shape
+            print(NewData.shape)
 
             #fidData=numpy.zeros((len(Dita)),dtype='complex64')
             
             for i,de in enumerate(death):
                 dic,data = ng.pipe.read(str(de)+'/test.ft2') #read fids
-                print de,data.shape
+                print(de,data.shape)
                 NewData[i,:]=data
 
                 #dac,dita = ng.pipe.read(str(de)+'/test.fid') #read fids
@@ -383,7 +386,7 @@ class process():
 
             #set xrange for dim12.
 
-            print os.getcwd()
+            print(os.getcwd())
             #for key,val in Dic.items():
             #    if(val!=doc[key]):
             #        print key,val,doc[key]
@@ -461,9 +464,9 @@ class process():
             os.system('rm testP1.txt')
             os.system('rm testP2.txt')
             
-            print 'deleting:',death
+            print('deleting:',death)
             for de in death:
-                print de
+                print(de)
                 if(os.path.exists(str(de)+'/test.ft2')==True):
                     os.system('rm -rf '+str(de)+'/test.ft2')
                     os.system('rm -rf '+str(de)+'/test.fid')
@@ -497,7 +500,7 @@ class process():
         gnu.write('\'integration.%s.out\' u 1:3 ti\'%s\' w points lc %i,\'\' u 1:4 ti \'%s\' w points lc %i' % (self.tag,self.tag+' '+str(self.integ[0]),1,self.tag+' '+str(self.integ[1]),1))
         gnu.close()
         os.system('gnuplot gnu.gp')
-        print self.before+'/py/arraygraph.py 2 4 0 0 0 0 `ls figs/*.eps`'
+        print(self.before+'/py/arraygraph.py 2 4 0 0 0 0 `ls figs/*.eps`')
         os.system(self.before+'/py/arraygraph.py 2 4 0 0 0 0 `ls figs/*.eps`')
         os.system('mv summary.pdf '+self.tag+'.pdf') #move pdf new place
 
